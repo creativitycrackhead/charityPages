@@ -396,6 +396,52 @@ main { padding-bottom: 72px; }
 .file-btn:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
 .backup-msg { margin-top: 10px !important; font-weight: 600; color: var(--brand-2) !important; }
 
+/* Program dashboard and impact log */
+.dash-head { background: var(--tint); }
+.dash-head .crumbs { margin-bottom: 16px; }
+.dash-title-row { display: flex; align-items: center; gap: 16px; }
+.dash-title-row .card-icon { width: 56px; height: 56px; background: var(--surface); }
+.dash-title-row h1 { margin: 0; font-size: clamp(1.8rem, 4.5vw, 2.6rem); }
+.dash-title-row .dash-meta { margin: 4px 0 0; }
+.dash-progress { display: grid; gap: 8px; margin-top: 20px; max-width: 640px; font-size: 0.95rem; color: var(--muted); }
+.dash-progress .progress span { background: var(--c); }
+.dash-progress strong { color: var(--text); }
+.dash-head .stats { border-top-color: rgba(0, 0, 0, 0.08); }
+.dash-head .stat strong { color: var(--c); }
+
+.chart { margin: 32px 0 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 18px 8px; }
+.chart figcaption { font-weight: 700; margin-bottom: 8px; }
+.chart-box { position: relative; color: var(--c, var(--brand-2)); }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .baseline { stroke: var(--muted); stroke-width: 1; }
+.chart .axis { fill: var(--muted); font-size: 11px; font-family: var(--font); }
+.chart .bar path { fill: currentColor; }
+.chart .bar .hit { fill: transparent; }
+.chart .bar:hover path { opacity: 0.8; }
+.chart-tip {
+  position: absolute; transform: translateX(-50%); pointer-events: none; white-space: nowrap;
+  background: var(--text); color: var(--bg); font-size: 0.82rem; font-weight: 600; padding: 6px 10px; border-radius: 8px;
+}
+
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px; align-items: start; }
+.log-form, .share { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.log-form h2, .share h2, .log-table h2 { font-size: 1.3rem; margin: 0 0 12px; }
+#log-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+#log-form label { display: grid; gap: 4px; font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+#log-form .full { grid-column: 1 / -1; }
+#log-form input { font: inherit; font-weight: 400; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+#log-form input:focus { outline: none; border-color: var(--brand-2); box-shadow: 0 0 0 3px var(--brand-soft); }
+#log-form .btn { justify-content: center; }
+.form-msg { grid-column: 1 / -1; margin: 0; font-weight: 600; color: var(--brand-2); min-height: 1.2em; }
+.share p { color: var(--muted); margin: 0 0 12px; }
+.share blockquote { margin: 0 0 14px; padding: 14px 16px; border-left: 4px solid var(--accent); background: var(--bg); border-radius: 8px; }
+.log-table { margin-top: 32px; }
+.nowrap { white-space: nowrap; }
+.note-cell { color: var(--muted); max-width: 320px; }
+.log-table td:nth-child(n+2), .log-table th:nth-child(n+2) { text-align: left; }
+.empty-state.small { margin-top: 32px; padding: 28px 16px; }
+
 /* Guide */
 .guide { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
 .guide li { display: flex; gap: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
@@ -410,7 +456,7 @@ main { padding-bottom: 72px; }
 
 /* About */
 .prose p { max-width: 68ch; }
-.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); margin-top: 16px; }
+.table-wrap { position: relative; overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); margin-top: 16px; }
 table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
 th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); }
 th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
@@ -431,6 +477,7 @@ td:nth-child(n+3), th:nth-child(n+3) { text-align: center; }
 }
 
 @media (max-width: 760px) {
+  .dash-grid { grid-template-columns: 1fr; }
   .dash-row { grid-template-columns: auto 1fr auto; }
   .dash-next { grid-column: 2 / -1; }
 }
@@ -446,6 +493,7 @@ td:nth-child(n+3), th:nth-child(n+3) { text-align: center; }
   .pager .next { grid-column: 1; }
   .guide li { flex-direction: column; gap: 6px; }
   .action.tracked { padding-left: 60px; }
+  #log-form { grid-template-columns: 1fr; }
   .action.tracked::before { display: none; }
   .nav { gap: 0; }
   .nav a { padding: 6px 7px; }

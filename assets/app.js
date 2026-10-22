@@ -453,7 +453,7 @@
       '<div class="tracker">' +
       '<div class="tracker-head"><div><strong>' + esc(status) + "</strong>" +
       '<span class="tracker-meta">Started ' + esc(fmtDate(prog.startedAt)) + "</span></div>" +
-      '<a class="text-link no-print" href="#/my">My programs ' + icon("arrow", "icon icon-sm") + "</a></div>" +
+      '<a class="text-link no-print" href="#/my/' + idea.id + '">Dashboard and impact ' + icon("arrow", "icon icon-sm") + "</a></div>" +
       progressBar(p) +
       '<label class="lead-field">Program lead <input type="text" data-track="lead" maxlength="80" placeholder="Who owns this program?" value="' + esc(prog.lead || "") + '"></label>' +
       '<button type="button" class="link-btn no-print" data-track="stop">Stop tracking</button>' +
@@ -527,6 +527,211 @@
     });
   }
 
+  // ---- Impact log ----
+  // Each tracked program can keep prog.log = [{ id, date: "YYYY-MM-DD",
+  // families, hours, saved, note }], one entry per session or distribution.
+
+  function impactOf(prog) {
+    var log = (prog.log || []).slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
+    var sum = function (k) { return log.reduce(function (n, e) { return n + (Number(e[k]) || 0); }, 0); };
+    return {
+      log: log,
+      sessions: log.length,
+      families: sum("families"),
+      hours: sum("hours"),
+      saved: sum("saved"),
+      first: log.length ? log[0].date : null,
+    };
+  }
+
+  function num(n) { return Number(n).toLocaleString(undefined, { maximumFractionDigits: 1 }); }
+  function money(n) { return "$" + Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 }); }
+
+  function fmtDay(ymd) {
+    // Parse as a local date so "2026-10-22" doesn't shift a day in some time zones.
+    var parts = ymd.split("-");
+    return fmtDate(new Date(+parts[0], +parts[1] - 1, +parts[2]).toISOString());
+  }
+
+  function todayYmd() {
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+
+  function niceMax(v) {
+    if (v <= 5) return 5;
+    var pow = Math.pow(10, Math.floor(Math.log10(v)));
+    var steps = [1, 2, 2.5, 5, 10];
+    for (var i = 0; i < steps.length; i++) if (steps[i] * pow >= v) return steps[i] * pow;
+    return 10 * pow;
+  }
+
+  // Single-series bar chart of families served per session (most recent 24).
+  function impactChart(log, category) {
+    var data = log.slice(-24);
+    if (!data.length) return "";
+    // Size the drawing to the space available so text stays readable on phones.
+    var W = Math.round(Math.min(1080, Math.max(300, main.clientWidth - 70))), H = W < 500 ? 200 : 240, padL = 36, padR = 8, padT = 12, padB = 28;
+    var max = niceMax(Math.max.apply(null, data.map(function (e) { return Number(e.families) || 0; })));
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var slot = plotW / data.length;
+    var barW = Math.max(4, Math.min(40, slot - 2));
+    var grid = [0, 0.5, 1].map(function (f) {
+      var y = padT + plotH - f * plotH;
+      return '<line class="grid" x1="' + padL + '" x2="' + (W - padR) + '" y1="' + y + '" y2="' + y + '"/>' +
+        '<text class="axis" x="' + (padL - 6) + '" y="' + (y + 4) + '" text-anchor="end">' + num(max * f) + "</text>";
+    }).join("");
+    var bars = data.map(function (e, i) {
+      var v = Number(e.families) || 0;
+      var h = Math.max(v > 0 ? 2 : 0, (v / max) * plotH);
+      var x = padL + i * slot + (slot - barW) / 2;
+      var y = padT + plotH - h;
+      var r = Math.min(4, barW / 2, h);
+      // Rounded top corners only, anchored flat on the baseline.
+      var d = "M" + x + "," + (padT + plotH) + "V" + (y + r) + "Q" + x + "," + y + " " + (x + r) + "," + y +
+        "H" + (x + barW - r) + "Q" + (x + barW) + "," + y + " " + (x + barW) + "," + (y + r) + "V" + (padT + plotH) + "Z";
+      var tip = fmtDay(e.date) + ": " + num(v) + (v === 1 ? " family" : " families") + (e.hours ? ", " + num(e.hours) + " volunteer hours" : "");
+      return '<g class="bar" data-tip="' + esc(tip) + '"><rect class="hit" x="' + (padL + i * slot) + '" y="' + padT + '" width="' + slot + '" height="' + plotH + '"/>' +
+        (h ? '<path d="' + d + '"/>' : "") + "<title>" + esc(tip) + "</title></g>";
+    }).join("");
+    var labels = [0, data.length - 1].filter(function (v, i, a) { return a.indexOf(v) === i; }).map(function (i) {
+      var x = padL + i * slot + slot / 2;
+      return '<text class="axis" x="' + x + '" y="' + (H - 8) + '" text-anchor="' + (i === 0 && data.length > 1 ? "start" : data.length > 1 ? "end" : "middle") + '">' + esc(fmtDay(data[i].date)) + "</text>";
+    }).join("");
+    return (
+      '<figure class="chart cat-tint-' + category + '"><figcaption>Families served per session' + (log.length > 24 ? " (latest 24)" : "") + "</figcaption>" +
+      '<div class="chart-box"><svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Bar chart of families served per session">' +
+      grid + '<line class="baseline" x1="' + padL + '" x2="' + (W - padR) + '" y1="' + (padT + plotH) + '" y2="' + (padT + plotH) + '"/>' +
+      bars + labels + "</svg>" + '<div class="chart-tip" hidden></div></div></figure>'
+    );
+  }
+
+  function shareText(idea, prog, im) {
+    var parts = [];
+    parts.push("Alhamdulillah! Since " + fmtDay(im.first) + ", our " + idea.title + " has served " + num(im.families) +
+      (im.families === 1 ? " family" : " families") + " over " + im.sessions + (im.sessions === 1 ? " session" : " sessions") + ".");
+    if (im.hours) parts.push("Volunteers gave " + num(im.hours) + " hours of their time.");
+    if (im.saved) parts.push("Together we saved families about " + money(im.saved) + ".");
+    parts.push("JazakAllahu khayran to everyone who helped. Everyone is welcome to join us.");
+    return parts.join(" ");
+  }
+
+  function renderProgramDash(idea) {
+    var prog = getProgram(idea.id);
+    if (!prog) { location.hash = "#/idea/" + idea.id; return; }
+    setTitle(idea.title + " dashboard");
+    currentDash = idea;
+    var p = progressOf(idea, prog);
+    var im = impactOf(prog);
+
+    var tiles = [
+      [num(im.families), "families served"],
+      [im.sessions, im.sessions === 1 ? "session logged" : "sessions logged"],
+      [num(im.hours), "volunteer hours"],
+      [im.saved ? money(im.saved) : "–", "saved for families"],
+    ].map(function (t) { return '<div class="stat"><strong>' + t[0] + "</strong><span>" + t[1] + "</span></div>"; }).join("");
+
+    var next = p.nextIndex === -1 ? "All steps done" : "Next step: " + idea.actions[p.nextIndex].title;
+
+    var rows = im.log.slice().reverse().map(function (e) {
+      return '<tr><td class="nowrap">' + esc(fmtDay(e.date)) + "</td><td>" + num(e.families || 0) + "</td><td>" + num(e.hours || 0) + "</td><td>" +
+        (e.saved ? money(e.saved) : "–") + '</td><td class="note-cell">' + esc(e.note || "") + "</td>" +
+        '<td><button type="button" class="link-btn" data-del="' + esc(e.id) + '">Delete</button></td></tr>';
+    }).join("");
+
+    main.innerHTML =
+      '<section class="page-head cat-tint-' + idea.category + ' dash-head"><div class="wrap">' +
+      '<p class="crumbs"><a href="#/my">My programs</a> <span aria-hidden="true">/</span> ' + esc(idea.title) + "</p>" +
+      '<div class="dash-title-row"><span class="card-icon cat-' + idea.category + '">' + icon(idea.category) + "</span>" +
+      "<div><h1>" + esc(idea.title) + "</h1>" +
+      '<p class="dash-meta">Started ' + esc(fmtDate(prog.startedAt)) + (prog.lead ? " · Lead: " + esc(prog.lead) : "") + "</p></div></div>" +
+      '<div class="dash-progress">' + progressBar(p) + '<span><strong>' + p.pct + "%</strong> of steps done · " + esc(next) +
+      ' · <a href="#/idea/' + idea.id + '">Open the plan</a></span></div>' +
+      '<div class="stats">' + tiles + "</div>" +
+      "</div></section>" +
+      '<div class="wrap">' +
+      (im.sessions ? impactChart(im.log, idea.category) : '<div class="empty-state small"><h2>No impact logged yet</h2><p>After each session or distribution, add a line below. Your totals, chart and shareable summary build up from there.</p></div>') +
+      '<div class="dash-grid">' +
+      '<section class="log-form no-print"><h2>Log a session</h2>' +
+      '<form id="log-form">' +
+      '<label>Date<input type="date" name="date" required value="' + todayYmd() + '"></label>' +
+      '<label>Families served<input type="number" name="families" min="0" step="1" required inputmode="numeric"></label>' +
+      '<label>Volunteer hours<input type="number" name="hours" min="0" step="0.5" inputmode="decimal"></label>' +
+      '<label>Money saved for families ($, optional)<input type="number" name="saved" min="0" step="1" inputmode="numeric"></label>' +
+      '<label class="full">Note (optional)<input type="text" name="note" maxlength="140" placeholder="What went well, what to change"></label>' +
+      '<button type="submit" class="btn btn-primary full">Add to log</button>' +
+      '<p class="form-msg" id="log-msg" aria-live="polite"></p></form></section>' +
+      '<section class="share"><h2>Share the results</h2>' +
+      (im.sessions
+        ? "<p>Read this after Jumu'ah, post it in the WhatsApp group, or send it to the board. It shares numbers only, never names.</p>" +
+          '<blockquote id="share-text">' + esc(shareText(idea, prog, im)) + "</blockquote>" +
+          '<button type="button" class="btn btn-ghost no-print" id="copy-share">' + icon("link") + "<span>Copy summary</span></button>"
+        : "<p>Once you've logged a session, a ready-to-read summary appears here.</p>") +
+      "</section></div>" +
+      (im.sessions
+        ? '<section class="log-table"><h2>Impact log</h2><div class="table-wrap"><table><thead><tr><th>Date</th><th>Families</th><th>Hours</th><th>Saved</th><th>Note</th><th><span class="sr">Actions</span></th></tr></thead><tbody>' + rows + "</tbody></table></div></section>"
+        : "") +
+      "</div>";
+
+    var form = document.getElementById("log-form");
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var f = new FormData(form);
+      var entry = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        date: f.get("date"),
+        families: Math.max(0, Math.round(Number(f.get("families")) || 0)),
+        hours: Math.max(0, Number(f.get("hours")) || 0),
+        saved: Math.max(0, Math.round(Number(f.get("saved")) || 0)),
+        note: String(f.get("note") || "").trim(),
+      };
+      if (!entry.date) return;
+      updateProgram(idea.id, function (prog) { prog.log = (prog.log || []).concat(entry); });
+      renderProgramDash(idea);
+      document.getElementById("log-msg").textContent = "Added.";
+    });
+
+    var copyShare = document.getElementById("copy-share");
+    if (copyShare) {
+      copyShare.addEventListener("click", function () {
+        var label = copyShare.querySelector("span");
+        var text = document.getElementById("share-text").textContent;
+        function done(t) { label.textContent = t; setTimeout(function () { label.textContent = "Copy summary"; }, 2000); }
+        if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { done("Copied"); }, function () { done("Couldn't copy"); });
+        else done("Couldn't copy");
+      });
+    }
+
+    var box = main.querySelector(".chart-box");
+    if (box) {
+      var tipEl = box.querySelector(".chart-tip");
+      box.addEventListener("pointermove", function (e) {
+        var g = e.target.closest(".bar");
+        if (!g) { tipEl.hidden = true; return; }
+        var r = box.getBoundingClientRect();
+        tipEl.textContent = g.dataset.tip;
+        tipEl.hidden = false;
+        var x = Math.min(Math.max(e.clientX - r.left, 80), r.width - 80);
+        tipEl.style.left = x + "px";
+        tipEl.style.top = (e.clientY - r.top - 44) + "px";
+      });
+      box.addEventListener("pointerleave", function () { tipEl.hidden = true; });
+    }
+  }
+
+  // Delete buttons in the log table (delegated, like the tracker).
+  var currentDash = null;
+  main.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-del]");
+    if (!btn || !currentDash) return;
+    var idea = currentDash;
+    if (!window.confirm("Delete this log entry?")) return;
+    updateProgram(idea.id, function (prog) {
+      prog.log = (prog.log || []).filter(function (en) { return en.id !== btn.dataset.del; });
+    });
+    renderProgramDash(idea);
+  });
+
   // ---- My programs (dashboard) ----
 
   function renderMy() {
@@ -539,18 +744,21 @@
     });
     items.sort(function (a, b) { return (b.prog.updatedAt || "").localeCompare(a.prog.updatedAt || ""); });
 
+    items.forEach(function (it) { it.im = impactOf(it.prog); });
     var stepsDone = items.reduce(function (n, it) { return n + it.p.done; }, 0);
-    var finished = items.filter(function (it) { return it.p.done === it.p.total; }).length;
+    var families = items.reduce(function (n, it) { return n + it.im.families; }, 0);
+    var hours = items.reduce(function (n, it) { return n + it.im.hours; }, 0);
 
     var head =
       '<section class="page-head"><div class="wrap">' +
       '<p class="eyebrow">Dashboard</p><h1>My programs</h1>' +
-      '<p class="lede">Every program your masjid is running, how far along it is, and what to do next.</p>' +
+      '<p class="lede">Every program your masjid is running, how far along it is, and the difference it\'s making. Open one to log sessions and see its impact.</p>' +
       (items.length
         ? '<div class="stats">' +
           [[items.length, items.length === 1 ? "program in progress" : "programs in progress"],
            [stepsDone, stepsDone === 1 ? "step done" : "steps done"],
-           [finished, "fully launched"]].map(function (s) {
+           [num(families), "families served"],
+           [num(hours), "volunteer hours"]].map(function (s) {
             return '<div class="stat"><strong>' + s[0] + "</strong><span>" + s[1] + "</span></div>";
           }).join("") + "</div>"
         : "") +
@@ -571,11 +779,12 @@
           ? '<span class="dash-next done">' + icon("check", "icon icon-sm") + "All steps done</span>"
           : '<span class="dash-next"><span class="dash-label">Next step</span>' + esc(idea.actions[p.nextIndex].title) + "</span>";
         return (
-          '<li><a class="dash-row cat-tint-' + idea.category + '" href="#/idea/' + idea.id + '">' +
+          '<li><a class="dash-row cat-tint-' + idea.category + '" href="#/my/' + idea.id + '">' +
           '<span class="card-icon cat-' + idea.category + '">' + icon(idea.category) + "</span>" +
           '<span class="dash-main"><span class="dash-title">' + esc(idea.title) + "</span>" +
           '<span class="dash-meta">Started ' + esc(fmtDate(prog.startedAt)) +
-          (prog.lead ? " · Lead: " + esc(prog.lead) : "") + "</span>" +
+          (prog.lead ? " · Lead: " + esc(prog.lead) : "") +
+          (it.im.sessions ? " · " + num(it.im.families) + (it.im.families === 1 ? " family" : " families") + " served" : "") + "</span>" +
           progressBar(p) + "</span>" +
           '<span class="dash-pct"><strong>' + p.pct + "%</strong><span>" + p.done + "/" + p.total + " steps</span></span>" +
           next + "</a></li>"
@@ -728,10 +937,12 @@
     var parts = hash.split("/");
     var page = parts[0] || "home";
     currentIdea = null;
+    currentDash = null;
     if (page === "idea" && byId[parts[1]]) renderIdea(byId[parts[1]]);
     else if (page === "ideas") renderList(parts[1]);
     else if (page === "start") renderStart();
     else if (page === "about") renderAbout();
+    else if (page === "my" && byId[parts[1]] && getProgram(parts[1])) renderProgramDash(byId[parts[1]]);
     else if (page === "my") renderMy();
     else { page = "home"; renderHome(); }
 
