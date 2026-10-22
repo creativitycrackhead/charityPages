@@ -112,97 +112,36 @@
   function setTitle(t) { document.title = t ? t + " · Masjid Community Ideas" : "Masjid Community Ideas"; }
 
   // ---- Home ----
+  // Deliberately minimal: one message, one search box, one way in per category.
+  // Detail lives on the Ideas page and each program's own page.
 
   function renderHome() {
     setTitle("");
-    var exampleCount = ranked.reduce(function (n, i) {
-      return n + i.examples.filter(function (e) { return e.url; }).length;
-    }, 0);
-    var quick = ranked.filter(function (i) { return i.glance.launchWeeks <= 4; }).length;
-    var cheap = ranked.filter(function (i) { return i.glance.costMax !== null && i.glance.costMax <= 100; }).length;
-
-    var stats = [
-      [ranked.length, "programs, each with a step-by-step plan"],
-      [exampleCount, "real examples to learn from, with links"],
-      [quick, "can launch within a month"],
-      [cheap, "cost $100 or less to start"],
-    ].map(function (s) {
-      return '<div class="stat"><strong>' + s[0] + "</strong><span>" + s[1] + "</span></div>";
+    var cats = Object.keys(CATS).map(function (key) {
+      return '<li><a class="home-cat cat-' + key + '" href="#/ideas/' + key + '">' + icon(key, "icon icon-sm") + esc(CATS[key]) + "</a></li>";
     }).join("");
-
-    var counts = {};
-    ranked.forEach(function (i) { counts[i.category] = (counts[i.category] || 0) + 1; });
-    var tiles = Object.keys(CATS).map(function (key) {
-      return (
-        '<li><a class="tile cat-tint-' + key + '" href="#/ideas/' + key + '">' +
-        '<span class="tile-icon cat-' + key + '">' + icon(key) + "</span>" +
-        "<span><strong>" + esc(CATS[key]) + "</strong><span>" + esc(CAT_BLURBS[key]) + "</span></span>" +
-        '<span class="tile-count">' + counts[key] + "</span></a></li>"
-      );
-    }).join("");
-
-    var topThree = ranked.slice(0, 3);
-    var quickWins = ranked.slice(3).sort(function (a, b) {
-      return b.scores.ease - a.scores.ease || a.glance.launchWeeks - b.glance.launchWeeks || a.rank - b.rank;
-    }).slice(0, 3);
-
-    var proof = [
-      ["National Zakat Foundation", "zakat-qard-hasan-fund"],
-      ["Sufra NW London", "masjid-pantry"],
-      ["Muslim Food Bank, B.C.", "masjid-pantry"],
-      ["IMAN Chicago", "resume-job-essay-help"],
-      ["Islamic Relief USA", "clothing-swap"],
-      ["Open Iftar", "community-iftar"],
-      ["Wembley Central Mosque", "repair-cafe"],
-      ["Finsbury Park Mosque", "repair-cafe"],
-      ["ICNA Relief", "benefits-navigation"],
-      ["UMMA Community Clinic", "benefits-navigation"],
-    ].map(function (p) { return '<li><a href="#/idea/' + p[1] + '">' + esc(p[0]) + "</a></li>"; }).join("");
 
     main.innerHTML =
-      '<section class="hero"><div class="wrap hero-inner">' +
-      '<div class="hero-copy">' +
-      '<p class="eyebrow">For masjid leaders and volunteers</p>' +
+      '<section class="home"><div class="wrap home-inner">' +
+      starSvg("home-star") +
       "<h1>Make your masjid the heart of the neighborhood.</h1>" +
-      '<p class="lede">Practical programs any mosque can start with the people it already has. Each one shows who is already doing it, gives you a step-by-step plan, and tells you what to watch out for.</p>' +
-      '<div class="cta-row"><a class="btn btn-primary" href="#/ideas">Find a program ' + icon("arrow") + "</a>" +
-      '<a class="btn btn-ghost" href="#/start">How to start</a></div>' +
-      "</div>" + heroArt() + "</div></section>" +
+      '<p class="lede">' + ranked.length + " simple programs any mosque can start with the people it already has.</p>" +
+      '<form class="home-search" role="search" id="home-search">' +
+      '<label class="sr" for="home-q">Search programs</label>' +
+      '<input id="home-q" type="search" placeholder="Try zakat, iftar or tutoring" autocomplete="off">' +
+      '<button type="submit" class="btn btn-primary">Search</button></form>' +
+      '<ul class="home-cats" aria-label="Browse by need">' + cats + "</ul>" +
+      '<p class="home-links"><a class="text-link" href="#/ideas">See all programs ' + icon("arrow", "icon icon-sm") + "</a>" +
+      '<a class="text-link" href="#/start">How to start ' + icon("arrow", "icon icon-sm") + "</a></p>" +
+      "</div></section>";
 
-      '<section class="stats-band"><div class="wrap stats">' + stats + "</div></section>" +
-
-      '<section class="section"><div class="wrap">' +
-      '<div class="section-head"><p class="eyebrow">Start where your community is</p><h2>What do your families need most?</h2></div>' +
-      '<ul class="tiles">' + tiles + "</ul></div></section>" +
-
-      '<section class="section section-alt"><div class="wrap">' +
-      '<div class="section-head"><p class="eyebrow">How it works</p><h2>Three steps from idea to impact</h2></div>' +
-      '<ol class="steps">' +
-      '<li><span class="step-num">1</span><h3>Pick one program</h3><p>Choose one that fits your families and the volunteers you already have. You don\'t need a big budget or a new building.</p></li>' +
-      '<li><span class="step-num">2</span><h3>Gather a small team</h3><p>One lead and a few volunteers is enough. Get your board\'s blessing and announce it after Jumu\'ah.</p></li>' +
-      '<li><span class="step-num">3</span><h3>Start small, then grow</h3><p>Run a pilot, learn from it and share the results with your jama\'ah. Good programs spread by word of mouth.</p></li>' +
-      '</ol><p class="center"><a class="text-link" href="#/start">Read the full guide to starting a program ' + icon("arrow", "icon icon-sm") + "</a></p></div></section>" +
-
-      '<section class="section"><div class="wrap">' +
-      '<div class="section-head split"><div><p class="eyebrow">Biggest difference</p><h2>The highest-ranked programs</h2></div>' +
-      '<a class="text-link" href="#/ideas">See all ' + ranked.length + " " + icon("arrow", "icon icon-sm") + "</a></div>" +
-      '<ol class="cards">' + topThree.map(card).join("") + "</ol>" +
-      '<div class="section-head split spaced"><div><p class="eyebrow">Quick wins</p><h2>Easiest to start this month</h2></div></div>' +
-      '<ol class="cards">' + quickWins.map(card).join("") + "</ol>" +
-      "</div></section>" +
-
-      '<section class="verse"><div class="wrap verse-inner">' + starSvg("verse-star") +
-      "<blockquote><p>“And cooperate in righteousness and piety.”</p>" +
-      "<footer>The Qur’an, Al-Ma’idah 5:2</footer></blockquote></div></section>" +
-
-      '<section class="section"><div class="wrap">' +
-      '<div class="section-head"><p class="eyebrow">Proven by communities like yours</p><h2>Learn from people already doing this</h2>' +
-      '<p class="section-sub">Every idea links to real mosques and Muslim-led charities running the same kind of program. These are a few of them.</p></div>' +
-      '<ul class="proof">' + proof + "</ul></div></section>" +
-
-      '<section class="cta-band"><div class="wrap cta-inner">' +
-      "<div><h2>Pick one idea. Start this month.</h2><p>Small programs, run well, build trust. And trust is what turns a masjid into a community.</p></div>" +
-      '<a class="btn btn-accent" href="#/ideas">Browse the ideas ' + icon("arrow") + "</a></div></section>";
+    document.getElementById("home-search").addEventListener("submit", function (e) {
+      e.preventDefault();
+      state.query = document.getElementById("home-q").value;
+      state.category = "all";
+      saveState();
+      location.hash = "#/ideas";
+    });
   }
 
   function starSvg(cls) {
@@ -210,16 +149,25 @@
       '<svg class="' + cls + '" viewBox="0 0 100 100" aria-hidden="true">' +
       '<rect x="22" y="22" width="56" height="56" rx="4"/>' +
       '<rect x="22" y="22" width="56" height="56" rx="4" transform="rotate(45 50 50)"/>' +
+      '<circle cx="50" cy="50" r="14" class="star-core"/>' +
       "</svg>"
     );
   }
 
-  function heroArt() {
-    var keys = Object.keys(CATS);
-    var chips = keys.map(function (k, i) {
-      return '<span class="orbit orbit-' + i + " cat-" + k + '">' + icon(k) + "</span>";
-    }).join("");
-    return '<div class="hero-art" aria-hidden="true">' + starSvg("hero-star") + '<span class="hero-star-core"></span>' + chips + "</div>";
+  function statsStrip() {
+    var examples = ranked.reduce(function (n, i) {
+      return n + i.examples.filter(function (e) { return e.url; }).length;
+    }, 0);
+    var quick = ranked.filter(function (i) { return i.glance.launchWeeks <= 4; }).length;
+    var cheap = ranked.filter(function (i) { return i.glance.costMax !== null && i.glance.costMax <= 100; }).length;
+    return '<div class="stats">' + [
+      [ranked.length, "programs with a step-by-step plan"],
+      [examples, "real examples to learn from"],
+      [quick, "can launch within a month"],
+      [cheap, "cost $100 or less to start"],
+    ].map(function (s) {
+      return '<div class="stat"><strong>' + s[0] + "</strong><span>" + s[1] + "</span></div>";
+    }).join("") + "</div>";
   }
 
   // ---- Ideas list ----
@@ -264,6 +212,7 @@
       '<p class="eyebrow">' + ranked.length + " programs</p>" +
       "<h1>Find the right program for your masjid</h1>" +
       '<p class="lede">Ranked by how much they can save families, how easy they are to start, and how many households they reach.</p>' +
+      statsStrip() +
       "</div></section>" +
       '<div class="wrap">' +
       '<section class="controls" aria-label="Filter programs">' +
@@ -454,10 +403,25 @@
       '<div class="table-wrap"><table><thead><tr><th>#</th><th>Program</th><th>Savings</th><th>Ease</th><th>Reach</th><th>Total</th></tr></thead><tbody>' + rows + "</tbody></table></div>" +
       "<h2>How we write</h2>" +
       "<p>We learned from charities known for clear, trusted communication, like charity: water, the National Zakat Foundation, Sufra NW London and Islamic Relief USA. That means we lead with hope, put people first (families, neighbors, guests), say what a program <em>can</em> do rather than promise results, and link to proof for every example. Read the full <a href=\"docs/style-guide.md\">style guide</a>.</p>" +
+      "<h2>Learn from people already doing this</h2>" +
+      "<p>Every program links to real mosques and Muslim-led charities running the same kind of work. A few of them:</p>" +
+      '<ul class="proof">' + [
+        ["National Zakat Foundation", "zakat-qard-hasan-fund"],
+        ["Sufra NW London", "masjid-pantry"],
+        ["Muslim Food Bank, B.C.", "masjid-pantry"],
+        ["IMAN Chicago", "resume-job-essay-help"],
+        ["Islamic Relief USA", "clothing-swap"],
+        ["Open Iftar", "community-iftar"],
+        ["Wembley Central Mosque", "repair-cafe"],
+        ["Finsbury Park Mosque", "repair-cafe"],
+        ["ICNA Relief", "benefits-navigation"],
+        ["UMMA Community Clinic", "benefits-navigation"],
+      ].map(function (p) { return '<li><a href="#/idea/' + p[1] + '">' + esc(p[0]) + "</a></li>"; }).join("") + "</ul>" +
       "<h2>About the examples</h2>" +
       "<p>Each program lists real organizations, many of them mosques or Muslim-led charities. They were confirmed to exist in October 2026, but programs change, so contact them before relying on details like dates, scale or eligibility.</p>" +
       "<h2>A note on religious guidance</h2>" +
       "<p>Where a program touches on fiqh, such as zakat eligibility, halal standards or arrangements between men and women, these pages give practical suggestions only. Ask your imam or a trusted scholar for rulings.</p>" +
+      '<blockquote class="verse-quote"><p>\u201cAnd cooperate in righteousness and piety.\u201d</p><footer>The Qur\u2019an, Al-Ma\u2019idah 5:2</footer></blockquote>' +
       "</div>";
   }
 
