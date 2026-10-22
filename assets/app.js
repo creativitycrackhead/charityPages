@@ -20,9 +20,9 @@
     food: "Halal groceries, pantries and shared meals.",
     money: "Zakat, benefits, taxes and budgeting.",
     jobs: "Resumes, interviews and scholarships.",
-    family: "Childcare and homework help.",
+    family: "Family events, childcare and homework help.",
     sharing: "Swaps, repairs and lending.",
-    care: "Rides and company for elders.",
+    care: "Rides for elders and open days for neighbors.",
   };
 
   // Flat, single-color icons (no gradients), drawn on a 24x24 grid.

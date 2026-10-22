@@ -830,4 +830,279 @@ window.IDEAS = [
       "No driver should be alone with a minor, and match riders and drivers in a way that's comfortable for both.",
     ],
   },
+
+  {
+    id: "dads-with-donuts",
+    title: "Dads with Donuts",
+    category: "family",
+    scores: { financial: 1, ease: 5, reach: 4 },
+    tagline: "Because kids remember the mornings their dads showed up.",
+    impact: "Kids get one-on-one time with their dads, dads meet other dads, and families get a reason to come to the masjid together.",
+    glance: { cost: "$50-150 per event (donuts and drinks)", costMax: 150, volunteers: "2-4", launch: "2 weeks", launchWeeks: 2 },
+    summary:
+      "A monthly Saturday morning for dads and their kids. Pray Fajr together (or start a little later in summer), then share halal donuts, juice and coffee, a ten-minute story from the imam, and a short activity side by side. Grandfathers, uncles and big brothers are just as welcome.",
+    why: [
+      "Kids who see their dads at the masjid are more likely to feel it's their place too.",
+      "Many dads want to be more involved but don't know where to start. A fixed, easy event gives them a reason to show up.",
+      "It's one of the cheapest and simplest programs a masjid can run, and it fills the masjid at Fajr.",
+    ],
+    examples: [
+      {
+        name: "\"Donuts with Dad\" at Aviano Elementary School",
+        text: "A popular school format: dads (or any parent or guardian) and kids share donuts and coffee before school, and kids show their dads around. This U.S. military-base school's PTA ran one to help busy families spend time together.",
+        url: "https://avianoes.dodea.edu/news/articles/aviano-elementary-school-hosts-heartwarming-donuts-dad-event",
+      },
+      {
+        name: "All Pro Dad breakfasts",
+        text: "A dads-and-kids breakfast held monthly at many U.S. schools, with a short talk on a family topic and time for dads and kids to talk together.",
+        url: "https://des.cocalico.org/school__student_activities/clubs_after_school_activities/all_pro_dads_breakfasts",
+      },
+      {
+        name: "Fajr Breakfast at Al Iman Islamic Centre (B.C., Canada)",
+        text: "A free Saturday program for adults, students and kids, run with Islamic Relief Canada: Fajr, a short reminder from the sheikh, a confidence-building activity, then breakfast together.",
+        url: "https://events.islamicreliefcanada.org/event/fajr-breakfast-al-iman-islamic-centre-i-metro-vancouver-253",
+      },
+    ],
+    resources: [
+      "1 organizer and 2-3 helpers to set up, serve and clean up",
+      "Halal donuts (check fillings and glazes for gelatin), juice, milk and coffee. A family can sponsor each month as sadaqah.",
+      "Tables in the hall, napkins, a trash plan",
+      "A simple activity: a craft, a Qur'an story with questions, or a ball game outside",
+      "A sign-in sheet and a photo-consent question",
+    ],
+    actions: [
+      { title: "Pick a monthly date and time", text: "For example, the first Saturday of the month: after Fajr in winter, or around 8:30 am in summer when Fajr is very early.", level: "simple" },
+      { title: "Line up donuts and a sponsor", text: "Find a bakery with halal-friendly donuts and ask a family or local business to sponsor each month.", level: "simple" },
+      { title: "Plan a 45-minute flow", text: "Welcome, a ten-minute story or reminder, a dads-and-kids activity, eat together, group photo.", level: "moderate", entry: "Date set and the imam (or a guest) has agreed to give the short talk.", exit: "A one-page run sheet with times, who does what, and the activity supplies ready." },
+      { title: "Invite every father figure", text: "Announce it after Jumu'ah and at weekend school. Say clearly that grandfathers, uncles, big brothers and mentors are welcome.", level: "simple" },
+      { title: "Run it and ask two questions", text: "At the end, ask kids what they liked and dads what would bring them back.", level: "simple" },
+      { title: "Keep it fresh", text: "Rotate activities: a service project, a sports morning, a Qur'an recitation challenge, or a seasonal theme before Ramadan and Eid.", level: "simple" },
+    ],
+    watchouts: [
+      "Some kids don't have a dad at home. Make uncles, grandfathers and mentors welcome, and pair a volunteer with any child who comes alone.",
+      "Kids stay with their own adult the whole time. Ask before posting any photos.",
+      "Keep it short and on time. Families come back to events that respect their morning.",
+    ],
+  },
+
+  {
+    id: "moms-kids-chai",
+    title: "Moms, kids & chai",
+    category: "family",
+    scores: { financial: 1, ease: 5, reach: 3 },
+    tagline: "Because mothers need a moment for themselves and with their kids.",
+    impact: "Mothers can make friends at the masjid, kids get a special outing, and new or isolated mothers get connected.",
+    glance: { cost: "$50-150 per event (tea and snacks)", costMax: 150, volunteers: "3-5 sisters", launch: "2-3 weeks", launchWeeks: 3 },
+    summary:
+      "A relaxed afternoon tea for mothers and their kids in the sisters' space: chai and snacks, a simple craft to make together, and a short, warm talk. It's the sisters' companion to Dads with Donuts, and many mosques run it as a mother-daughter high tea.",
+    why: [
+      "Mothers of young children are often the most isolated people in a community, and the least likely to have time for themselves.",
+      "A friendly, child-welcome event is how many sisters first feel at home in the masjid.",
+      "It builds the sisters' network that every other program depends on, from meal trains to the childcare co-op.",
+    ],
+    examples: [
+      {
+        name: "\"Chai & Cherish\" mother-daughter high tea at MIA Grand Masjid, Winnipeg",
+        text: "Islamic Relief Canada hosted this ladies-only tea at a Winnipeg mosque, with tea, sweet and savoury treats and crafts like making a tasbih, with ticket proceeds going to its orphan sponsorship work.",
+        url: "https://www.islamicreliefcanada.org/event/chai-cherish-mother-daughter-high-tea-winnipeg-213",
+      },
+      {
+        name: "Assunnah Muslims Association mother-daughter high tea (Canada)",
+        text: "A mosque-run mother-daughter tea listed on the community's events platform.",
+        url: "https://events.mymasjid.ca/e/852/mother-daughter-high-tea",
+      },
+    ],
+    resources: [
+      "A lead sister and 2-4 helpers",
+      "The sisters' hall or a classroom, with a corner for toddlers",
+      "Chai, coffee and snacks (sponsor-funded or a small ticket that covers costs or raises sadaqah)",
+      "A craft: painting a pot, decorating a du'a card, or making a tasbih",
+      "A short talk from a respected sister or a guest speaker",
+    ],
+    actions: [
+      { title: "Choose a format and date", text: "Monthly or quarterly. Weekend afternoons work well. Decide if it's for all kids or a mother-daughter special.", level: "simple" },
+      { title: "Plan the program", text: "Arrival and chai, a craft together, a 10-minute talk, then free time to chat.", level: "moderate", entry: "Date and room confirmed with the masjid board.", exit: "A run sheet, a supply list and a speaker confirmed." },
+      { title: "Invite personally", text: "Ask every sister on the committee to personally invite two mothers who rarely come to the masjid.", level: "simple" },
+      { title: "Run it", text: "Greet everyone at the door by name and introduce newcomers to two people.", level: "simple" },
+      { title: "Keep the connections going", text: "Start a sisters' WhatsApp group from the sign-in sheet (with permission) and share the next date.", level: "simple" },
+    ],
+    watchouts: [
+      "Keep the space private and comfortable for sisters, and ask before any photos.",
+      "Plan for babies and toddlers: a play mat, a helper and no hot drinks near little hands.",
+    ],
+  },
+
+  {
+    id: "family-game-night",
+    title: "Family game night",
+    category: "family",
+    scores: { financial: 1, ease: 5, reach: 4 },
+    tagline: "Because families that play together stay close.",
+    impact: "Families can have a free night out together and get to know other families in the masjid.",
+    glance: { cost: "Under $100 (games are often donated)", costMax: 100, volunteers: "2-4", launch: "2 weeks", launchWeeks: 2 },
+    summary:
+      "A monthly evening after Maghrib or Isha where families play board games, card games and quiz games together in the hall, with simple snacks. Add an Islamic trivia round, a kids' corner and a table where elders teach a classic game.",
+    why: [
+      "It gives families a screen-free night out that costs nothing.",
+      "Games break the ice between families who pray side by side but have never talked.",
+      "Teens, parents and grandparents can all play, which is rare for a masjid event.",
+    ],
+    examples: [
+      {
+        name: "Banbury Madni Masjid family games night (UK)",
+        text: "A regular Saturday evening of board games and activities run by the masjid and its education centre, with a small £1 entry.",
+        url: "https://banburymadnimasjid.com/resources/events/family-games-night/",
+      },
+      {
+        name: "Assunnah Muslims Association game night (Canada)",
+        text: "A mosque game night listed on the community's events platform.",
+        url: "https://events.mymasjid.ca/e/931/game-night",
+      },
+    ],
+    resources: [
+      "A collection of board games and card games (ask families to donate or lend)",
+      "Tables and chairs in the hall",
+      "Snacks and drinks",
+      "A volunteer host for an Islamic trivia round",
+    ],
+    actions: [
+      { title: "Collect games", text: "Ask after Jumu'ah for donated games. Label them as masjid property.", level: "simple" },
+      { title: "Pick a monthly night", text: "Fridays or Saturdays after Maghrib or Isha usually work best.", level: "simple" },
+      { title: "Plan the evening", text: "Open play, a 20-minute all-ages trivia round, and a cleanup game at the end.", level: "moderate", entry: "Games collected and date booked.", exit: "Tables planned by age group, trivia questions written, and snack sponsor confirmed." },
+      { title: "Run it and invite neighbors", text: "Once it's running well, invite neighbors and other congregations.", level: "simple" },
+    ],
+    watchouts: [
+      "Choose games that fit the masjid's values (no gambling-style play).",
+      "Plan supervision for younger kids, so parents can actually play.",
+    ],
+  },
+
+  {
+    id: "youth-sports-night",
+    title: "Youth sports night",
+    category: "family",
+    scores: { financial: 1, ease: 3, reach: 3 },
+    tagline: "Because young people should never have to choose between their team and their prayer.",
+    impact: "Teens can play sports in a setting where prayer is built in and coaches are role models, which keeps them connected to the masjid.",
+    glance: { cost: "$0-500 (depends on gym rental)", costMax: 500, volunteers: "3-6 coaches", launch: "4-6 weeks", launchWeeks: 6 },
+    summary:
+      "A weekly basketball, soccer or volleyball night for youth at the masjid's gym or a rented court, with a prayer break built in and a short talk from a coach or youth leader. It can grow into a league with other mosques.",
+    why: [
+      "Sports are where many young people spend their evenings. Running them through the masjid keeps teens close to the community.",
+      "Young players can pray without feeling awkward about stepping away from practice.",
+      "Coaches and older players become mentors for younger ones.",
+    ],
+    examples: [
+      {
+        name: "iDrive Faith and Athletics (Chicago area)",
+        text: "A Muslim youth basketball league for 1st to 12th graders, started in 2022 by two founders who met through an Islamic center. It grew out of a skills camp and is open to non-Muslims too.",
+        url: "https://depauliaonline.com/77220/sports/basketball-league-helps-young-muslim-players-merge-faith-and-sports-and-find-community/",
+      },
+      {
+        name: "Ottawa Muslim Summer League",
+        text: "A community summer sports league listed by the Assunnah Muslims Association in Ottawa.",
+        url: "https://events.mymasjid.ca/e/710/ottawa-muslim-summer-league",
+      },
+    ],
+    resources: [
+      "A gym, court or field (the masjid's own, a school's, or a rented city court)",
+      "Balls, cones and pinnies",
+      "3-6 coaches and adult supervisors, background-checked",
+      "A first-aid kit and a parent consent form",
+    ],
+    actions: [
+      { title: "Find a space and a night", text: "Ask local schools and city recreation centers about weekly court time.", level: "simple" },
+      { title: "Recruit and screen coaches", text: "Look for young adults who play and can be good role models.", level: "moderate", entry: "Space confirmed and the masjid's child-safety policy reviewed.", exit: "At least 3 coaches background-checked, briefed and scheduled." },
+      { title: "Set the format", text: "Warm-up, drills, games, a prayer break at the right time, and a 5-minute talk.", level: "simple" },
+      { title: "Register players", text: "Collect consent forms, emergency contacts and any health notes.", level: "moderate", entry: "Coaches in place and a registration form ready.", exit: "Signed forms for every player and a contact list for parents." },
+      { title: "Grow into a league", text: "Invite nearby mosques for friendly games, then a season.", level: "complex", entry: "At least one full season run safely with steady attendance.", exit: "Two or more mosques agree on a schedule, rules and shared referees." },
+    ],
+    watchouts: [
+      "Follow your child-safety policy: two adults present, and kids leave only with authorized adults.",
+      "Check insurance for sports on masjid property or rented space.",
+      "Keep it welcoming to beginners, not just the best players.",
+    ],
+  },
+
+  {
+    id: "open-mosque-day",
+    title: "Open mosque day",
+    category: "care",
+    scores: { financial: 1, ease: 4, reach: 3 },
+    tagline: "Because neighbors who visit become friends.",
+    impact: "Neighbors can see the masjid for themselves, ask questions over tea, and find out how to join its programs.",
+    glance: { cost: "Under $200 (tea, snacks, printed guides)", costMax: 200, volunteers: "6-12", launch: "4-6 weeks", launchWeeks: 6 },
+    summary:
+      "Once or twice a year, the masjid opens its doors to neighbors: guided tours, tea and sweets, a chance to watch a prayer, and a table for every community program they can join. It works well alongside a food drive or blood drive.",
+    why: [
+      "Most people have never been inside a mosque. A friendly visit replaces assumptions with real faces.",
+      "It recruits volunteers and partners for every other program on this site.",
+      "Local officials, police, schools and faith leaders get to know the masjid before they ever need to.",
+    ],
+    examples: [
+      {
+        name: "Visit My Mosque (UK)",
+        text: "A national open day facilitated by the Muslim Council of Britain since 2015, when about 20 mosques took part. By 2018 more than 200 mosques were opening their doors on the same day, often adding food collections and blood drives.",
+        url: "https://en.wikipedia.org/wiki/Visit_My_Mosque",
+      },
+    ],
+    resources: [
+      "6-12 friendly volunteers as greeters and tour guides, both brothers and sisters",
+      "Tea, coffee and sweets",
+      "Printed one-page guide: what a mosque is, what happens in prayer, how to join our programs",
+      "Signs, name tags and a guest book",
+      "Spare headscarves for visitors who'd like one (optional, never required)",
+    ],
+    actions: [
+      { title: "Pick a date and get the board's support", text: "Weekend afternoons work well. Avoid Jumu'ah and Ramadan nights.", level: "simple" },
+      { title: "Train tour guides", text: "A one-hour session: a simple route, common questions and how to answer warmly.", level: "moderate", entry: "Date set and at least 6 volunteers signed up.", exit: "Every guide has walked the route once and has the one-page guide." },
+      { title: "Invite neighbors", text: "Flyers to nearby houses, local schools, churches and synagogues, city council and police community officers.", level: "simple" },
+      { title: "Run the day", text: "Greet at the door, offer tea, run tours every 30 minutes, and staff a programs table.", level: "simple" },
+      { title: "Follow up", text: "Email or text guests who left contact details and invite them to the next community event.", level: "simple" },
+    ],
+    watchouts: [
+      "Be welcoming, not preachy. Answer questions; don't pressure anyone.",
+      "Agree in advance who speaks to any media or local officials.",
+    ],
+  },
+
+  {
+    id: "family-nature-walks",
+    title: "Family nature walks",
+    category: "family",
+    scores: { financial: 1, ease: 4, reach: 3 },
+    tagline: "Because reflecting on creation is part of faith.",
+    impact: "Families can get outdoors together for free, learn about caring for the earth, and make friends along the way.",
+    glance: { cost: "$0", costMax: 0, volunteers: "2-4", launch: "2-3 weeks", launchWeeks: 3 },
+    summary:
+      "A monthly family walk at a local park or trail: pray together outdoors, take a short reflection on a verse about creation, and finish with a picnic. Add a litter pick or a tree planting a few times a year as a service project.",
+    why: [
+      "It's free, healthy and easy for families with kids of all ages.",
+      "The Qur'an repeatedly invites us to reflect on creation, and kids learn that caring for the earth is part of being Muslim.",
+      "It's a relaxed way for new families and reverts to join in.",
+    ],
+    examples: [
+      {
+        name: "Green Muslims (Washington, D.C.)",
+        text: "A volunteer group that connects faith and nature through hikes, service days and Our Deen is Green, an interfaith summer program that takes kids of different faiths outdoors together.",
+        url: "https://chesapeakebaymagazine.com/green-muslims-group-puts-faith-in-bay-restoration/",
+      },
+    ],
+    resources: [
+      "A walk leader who knows a few easy, stroller-friendly trails",
+      "A first-aid kit and a list of emergency contacts",
+      "A short reflection (a verse or hadith about nature) and a prayer mat or two",
+      "Trash bags and gloves for a litter pick",
+    ],
+    actions: [
+      { title: "Choose 3-4 easy trails", text: "Short, safe and close by, with restrooms and parking.", level: "simple" },
+      { title: "Set a monthly date", text: "Weekend mornings or late afternoons, timed so you can pray Dhuhr or Asr outdoors together.", level: "simple" },
+      { title: "Plan the first walk", text: "Meeting point, route, reflection, prayer spot and picnic area.", level: "moderate", entry: "Trail chosen and a walk leader confirmed.", exit: "A route plan shared with families, plus a first-aid kit and a headcount process." },
+      { title: "Add a service day", text: "Partner with your local parks department for a litter pick or tree planting.", level: "simple" },
+    ],
+    watchouts: [
+      "Check the weather and the trail. Keep a headcount at the start and end.",
+      "Kids stay with their own adults. Bring water and sun protection.",
+    ],
+  },
 ];
