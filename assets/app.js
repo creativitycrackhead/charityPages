@@ -4,6 +4,7 @@
 //   #/idea/<id>        one idea
 //   #/start            how to start any program
 //   #/about            how ideas are scored and where the voice comes from
+//   #/my               dashboard of programs this browser is tracking
 (function () {
   "use strict";
 
@@ -36,6 +37,9 @@
     print: '<path d="M6 2h12v5H6z"/><path fill-rule="evenodd" d="M4 8h16a2 2 0 0 1 2 2v7h-4v5H6v-5H2v-7a2 2 0 0 1 2-2zm4 7v5h8v-5z"/>',
     link: '<path d="M10.6 13.4a1 1 0 0 1 0-1.4l4-4a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0z"/><path d="M8.5 11.5 6 14a3 3 0 0 0 4.2 4.2l2.5-2.5 1.4 1.4-2.5 2.5A5 5 0 0 1 4.5 12.5L7 10z"/><path d="M15.5 12.5 18 10a3 3 0 0 0-4.2-4.2l-2.5 2.5-1.4-1.4 2.5-2.5a5 5 0 0 1 7.1 7.1L17 14z"/>',
     check: '<path d="M9.5 16.2 5.3 12l-1.4 1.4 5.6 5.6L20.1 8.4 18.7 7z"/>',
+    flag: '<path d="M5 2h2v20H5z"/><path d="M8 3h11l-2.5 4.5L19 12H8z"/>',
+    download: '<path d="M11 3h2v9.2l3.6-3.6L18 10l-6 6-6-6 1.4-1.4 3.6 3.6z"/><path d="M4 18h16v2H4z"/>',
+    upload: '<path d="M11 16h2V6.8l3.6 3.6L18 9l-6-6-6 6 1.4 1.4L11 6.8z"/><path d="M4 18h16v2H4z"/>',
   };
 
   function icon(name, cls) {
@@ -261,9 +265,10 @@
     return '<ul class="' + (cls || "bullets") + '">' + items.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>";
   }
 
-  function renderIdea(idea) {
+  function renderIdea(idea, opts) {
     setTitle(idea.title);
     var g = idea.glance;
+    var scrollY = window.scrollY;
 
     var examples = idea.examples.map(function (ex) {
       var name = ex.url
@@ -272,7 +277,8 @@
       return "<li><h3>" + name + "</h3><p>" + esc(ex.text) + "</p></li>";
     }).join("");
 
-    var actions = idea.actions.map(function (a) {
+    var actions = idea.actions.map(function (a, i) {
+      var t = trackerStepControls(idea, i);
       var criteria = a.entry || a.exit
         ? '<dl class="criteria">' +
           (a.entry ? "<dt>Start when</dt><dd>" + esc(a.entry) + "</dd>" : "") +
@@ -280,9 +286,10 @@
           "</dl>"
         : "";
       return (
-        '<li class="action"><div class="action-head"><h3>' + esc(a.title) + "</h3>" +
+        '<li class="action' + (t.check ? " tracked" : "") + (t.done ? " is-done" : "") + '">' + t.check +
+        '<div class="action-head"><h3>' + esc(a.title) + "</h3>" +
         '<span class="level level-' + a.level + '">' + LEVELS[a.level] + "</span></div>" +
-        "<p>" + esc(a.text) + "</p>" + criteria + "</li>"
+        "<p>" + esc(a.text) + "</p>" + criteria + t.note + "</li>"
       );
     }).join("");
 
@@ -313,7 +320,7 @@
       '<section class="impact-callout">' + icon("check", "icon impact-icon") + "<p>" + esc(idea.impact) + "</p></section>" +
       '<section><h2>Why it matters</h2>' + bullets(idea.why) + "</section>" +
       '<section><h2>Proven by</h2><p class="section-sub">Real organizations running this kind of program. Follow the links to learn from them.</p><ul class="examples">' + examples + "</ul></section>" +
-      '<section><h2>Steps to start</h2><ol class="actions">' + actions + "</ol></section>" +
+      '<section id="steps"><h2>Steps to start</h2>' + trackerPanel(idea) + '<ol class="actions">' + actions + "</ol></section>" +
       '<section><h2>What you need</h2>' + bullets(idea.resources, "bullets checks") + "</section>" +
       '<section class="watch"><h2>Watch out for</h2>' + bullets(idea.watchouts) + "</section>" +
       '<section class="next-step no-print"><h2>Ready to start?</h2><p>Our guide covers what every program needs: a lead, your board\'s blessing, a small pilot and a way to share results.</p>' +
@@ -323,6 +330,8 @@
       (next ? '<a class="next" href="#/idea/' + next.id + '"><span>Next</span>' + esc(next.title) + "</a>" : "") +
       "</nav></div>";
 
+    currentIdea = idea;
+    if (opts && opts.keepScroll) window.scrollTo(0, scrollY);
     document.getElementById("print").addEventListener("click", function () { window.print(); });
     var copy = document.getElementById("copy");
     copy.addEventListener("click", function () {
@@ -333,6 +342,295 @@
       } else {
         done("Couldn't copy");
       }
+    });
+  }
+
+  // ---- Progress tracking ----
+  // Saved only in this browser (localStorage), keyed by idea id:
+  //   { startedAt, updatedAt, lead, steps: { <index>: { doneAt, note } } }
+  // Export/import lets a team move progress between devices until there's a
+  // shared backend (see TOOLS-NEEDED.md).
+
+  var STORE_KEY = "masjidPrograms.v1";
+  var storageOk = true;
+
+  function loadPrograms() {
+    try {
+      var data = JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
+      return data && typeof data === "object" ? data : {};
+    } catch (e) {
+      storageOk = false;
+      return {};
+    }
+  }
+
+  function savePrograms(data) {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(data));
+    } catch (e) {
+      storageOk = false;
+    }
+    updateNavCount();
+  }
+
+  function getProgram(id) { return loadPrograms()[id] || null; }
+
+  function updateProgram(id, fn) {
+    var data = loadPrograms();
+    if (!data[id]) return;
+    fn(data[id]);
+    data[id].updatedAt = new Date().toISOString();
+    savePrograms(data);
+  }
+
+  function startProgram(id) {
+    var data = loadPrograms();
+    if (!data[id]) {
+      var now = new Date().toISOString();
+      data[id] = { startedAt: now, updatedAt: now, lead: "", steps: {} };
+      savePrograms(data);
+    }
+  }
+
+  function stopProgram(id) {
+    var data = loadPrograms();
+    delete data[id];
+    savePrograms(data);
+  }
+
+  function progressOf(idea, prog) {
+    var done = idea.actions.filter(function (a, i) { return prog.steps[i] && prog.steps[i].doneAt; }).length;
+    var nextIndex = -1;
+    for (var i = 0; i < idea.actions.length; i++) {
+      if (!(prog.steps[i] && prog.steps[i].doneAt)) { nextIndex = i; break; }
+    }
+    return { done: done, total: idea.actions.length, pct: Math.round((done / idea.actions.length) * 100), nextIndex: nextIndex };
+  }
+
+  function trackedIds() {
+    var data = loadPrograms();
+    return Object.keys(data).filter(function (id) { return byId[id]; });
+  }
+
+  function updateNavCount() {
+    var el = document.getElementById("nav-count");
+    if (!el) return;
+    var n = trackedIds().length;
+    el.textContent = n;
+    el.hidden = n === 0;
+  }
+
+  function fmtDate(iso) {
+    try {
+      return new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function progressBar(p) {
+    return (
+      '<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + p.pct + '" aria-label="Progress">' +
+      '<span style="width:' + p.pct + '%"></span></div>'
+    );
+  }
+
+  // Tracker panel shown above the steps on an idea page.
+  function trackerPanel(idea) {
+    var prog = getProgram(idea.id);
+    if (!prog) {
+      return (
+        '<div class="tracker tracker-off no-print">' +
+        "<div><strong>Running this at your masjid?</strong><p>Track it here: tick off steps as you go, add notes, and see everything on your dashboard.</p></div>" +
+        '<button type="button" class="btn btn-primary" data-track="start">' + icon("flag") + "Start this program</button></div>"
+      );
+    }
+    var p = progressOf(idea, prog);
+    var status = p.done === p.total
+      ? "All steps done. Mabrook!"
+      : p.done + " of " + p.total + " steps done";
+    return (
+      '<div class="tracker">' +
+      '<div class="tracker-head"><div><strong>' + esc(status) + "</strong>" +
+      '<span class="tracker-meta">Started ' + esc(fmtDate(prog.startedAt)) + "</span></div>" +
+      '<a class="text-link no-print" href="#/my">My programs ' + icon("arrow", "icon icon-sm") + "</a></div>" +
+      progressBar(p) +
+      '<label class="lead-field">Program lead <input type="text" data-track="lead" maxlength="80" placeholder="Who owns this program?" value="' + esc(prog.lead || "") + '"></label>' +
+      '<button type="button" class="link-btn no-print" data-track="stop">Stop tracking</button>' +
+      "</div>"
+    );
+  }
+
+  function trackerStepControls(idea, i) {
+    var prog = getProgram(idea.id);
+    if (!prog) return { check: "", note: "", done: false };
+    var step = prog.steps[i] || {};
+    var done = !!step.doneAt;
+    return {
+      done: done,
+      check:
+        '<label class="step-check"><input type="checkbox" data-track="step" data-step="' + i + '"' + (done ? " checked" : "") + ">" +
+        '<span class="sr">Mark step ' + (i + 1) + " done</span></label>",
+      note:
+        (done ? '<p class="step-done">Done ' + esc(fmtDate(step.doneAt)) + "</p>" : "") +
+        '<label class="step-note"><span class="sr">Notes for step ' + (i + 1) + "</span>" +
+        '<textarea rows="1" data-track="note" data-step="' + i + '" placeholder="Add a note (who, when, what you learned)">' + esc(step.note || "") + "</textarea></label>",
+    };
+  }
+
+  // Delegated once on <main>; acts on whichever idea page is showing.
+  var currentIdea = null;
+
+  function bindTracker() {
+    main.addEventListener("click", function (e) {
+      var idea = currentIdea;
+      if (!idea) return;
+      var btn = e.target.closest("[data-track]");
+      if (!btn || btn.tagName === "INPUT" || btn.tagName === "TEXTAREA") return;
+      if (btn.dataset.track === "start") {
+        startProgram(idea.id);
+        renderIdea(idea, { keepScroll: true });
+      } else if (btn.dataset.track === "stop") {
+        if (window.confirm("Stop tracking " + idea.title + "? Your ticks and notes for it will be deleted from this browser.")) {
+          stopProgram(idea.id);
+          renderIdea(idea, { keepScroll: true });
+        }
+      }
+    });
+    main.addEventListener("change", function (e) {
+      var idea = currentIdea;
+      var el = e.target;
+      if (!idea) return;
+      if (el.dataset.track === "step") {
+        var i = el.dataset.step;
+        updateProgram(idea.id, function (prog) {
+          prog.steps[i] = prog.steps[i] || {};
+          prog.steps[i].doneAt = el.checked ? new Date().toISOString() : null;
+        });
+        renderIdea(idea, { keepScroll: true });
+      }
+    });
+    // Save text as people type, without re-rendering (keeps focus).
+    main.addEventListener("input", function (e) {
+      var idea = currentIdea;
+      var el = e.target;
+      if (!idea) return;
+      if (el.dataset.track === "note") {
+        updateProgram(idea.id, function (prog) {
+          var i = el.dataset.step;
+          prog.steps[i] = prog.steps[i] || {};
+          prog.steps[i].note = el.value;
+        });
+      } else if (el.dataset.track === "lead") {
+        updateProgram(idea.id, function (prog) { prog.lead = el.value; });
+      }
+    });
+  }
+
+  // ---- My programs (dashboard) ----
+
+  function renderMy() {
+    setTitle("My programs");
+    var data = loadPrograms();
+    var ids = trackedIds();
+    var items = ids.map(function (id) {
+      var idea = byId[id];
+      return { idea: idea, prog: data[id], p: progressOf(idea, data[id]) };
+    });
+    items.sort(function (a, b) { return (b.prog.updatedAt || "").localeCompare(a.prog.updatedAt || ""); });
+
+    var stepsDone = items.reduce(function (n, it) { return n + it.p.done; }, 0);
+    var finished = items.filter(function (it) { return it.p.done === it.p.total; }).length;
+
+    var head =
+      '<section class="page-head"><div class="wrap">' +
+      '<p class="eyebrow">Dashboard</p><h1>My programs</h1>' +
+      '<p class="lede">Every program your masjid is running, how far along it is, and what to do next.</p>' +
+      (items.length
+        ? '<div class="stats">' +
+          [[items.length, items.length === 1 ? "program in progress" : "programs in progress"],
+           [stepsDone, stepsDone === 1 ? "step done" : "steps done"],
+           [finished, "fully launched"]].map(function (s) {
+            return '<div class="stat"><strong>' + s[0] + "</strong><span>" + s[1] + "</span></div>";
+          }).join("") + "</div>"
+        : "") +
+      "</div></section>";
+
+    var body;
+    if (!storageOk) {
+      body = '<p class="notice">This browser is blocking saved data (for example, in a private window), so progress can\'t be kept here.</p>';
+    } else if (!items.length) {
+      body =
+        '<div class="empty-state">' + starSvg("home-star") +
+        "<h2>No programs yet</h2><p>Open any program and press <strong>Start this program</strong>. Its steps become a checklist, and it shows up here.</p>" +
+        '<a class="btn btn-primary" href="#/ideas">Browse the ideas ' + icon("arrow") + "</a></div>";
+    } else {
+      body = '<ul class="dash">' + items.map(function (it) {
+        var idea = it.idea, p = it.p, prog = it.prog;
+        var next = p.nextIndex === -1
+          ? '<span class="dash-next done">' + icon("check", "icon icon-sm") + "All steps done</span>"
+          : '<span class="dash-next"><span class="dash-label">Next step</span>' + esc(idea.actions[p.nextIndex].title) + "</span>";
+        return (
+          '<li><a class="dash-row cat-tint-' + idea.category + '" href="#/idea/' + idea.id + '">' +
+          '<span class="card-icon cat-' + idea.category + '">' + icon(idea.category) + "</span>" +
+          '<span class="dash-main"><span class="dash-title">' + esc(idea.title) + "</span>" +
+          '<span class="dash-meta">Started ' + esc(fmtDate(prog.startedAt)) +
+          (prog.lead ? " · Lead: " + esc(prog.lead) : "") + "</span>" +
+          progressBar(p) + "</span>" +
+          '<span class="dash-pct"><strong>' + p.pct + "%</strong><span>" + p.done + "/" + p.total + " steps</span></span>" +
+          next + "</a></li>"
+        );
+      }).join("") + "</ul>";
+    }
+
+    var backup =
+      '<section class="backup no-print"><h2>Share or move your progress</h2>' +
+      "<p>Progress is saved in this browser only. To hand it to another volunteer or move it to another device, download a backup file and load it there.</p>" +
+      '<div class="cta-row"><button type="button" class="btn btn-ghost" id="export"' + (items.length ? "" : " disabled") + ">" + icon("download") + "Download backup</button>" +
+      '<label class="btn btn-ghost file-btn">' + icon("upload") + 'Load a backup<input type="file" id="import" accept="application/json,.json"></label></div>' +
+      '<p class="backup-msg" id="backup-msg" aria-live="polite"></p></section>';
+
+    main.innerHTML = head + '<div class="wrap">' + body + backup + "</div>";
+
+    var exp = document.getElementById("export");
+    exp.addEventListener("click", function () {
+      var blob = new Blob([JSON.stringify({ app: "masjid-community-ideas", version: 1, exportedAt: new Date().toISOString(), programs: loadPrograms() }, null, 2)], { type: "application/json" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "masjid-programs-" + new Date().toISOString().slice(0, 10) + ".json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    });
+    document.getElementById("import").addEventListener("change", function (e) {
+      var file = e.target.files[0];
+      var msg = document.getElementById("backup-msg");
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        try {
+          var parsed = JSON.parse(reader.result);
+          var incoming = parsed && parsed.programs;
+          if (!incoming || typeof incoming !== "object") throw new Error("bad file");
+          // Merge: for a program in both, keep whichever was updated last.
+          var data = loadPrograms();
+          var added = 0;
+          Object.keys(incoming).forEach(function (id) {
+            var prog = incoming[id];
+            if (!byId[id] || !prog || typeof prog !== "object" || !prog.steps) return;
+            if (!data[id] || (prog.updatedAt || "") > (data[id].updatedAt || "")) { data[id] = prog; added++; }
+          });
+          savePrograms(data);
+          renderMy();
+          document.getElementById("backup-msg").textContent = added
+            ? "Loaded " + added + (added === 1 ? " program." : " programs.")
+            : "Nothing new in that file.";
+        } catch (err) {
+          msg.textContent = "That file isn't a backup from this site.";
+        }
+      };
+      reader.readAsText(file);
     });
   }
 
@@ -429,10 +727,12 @@
     var hash = location.hash.replace(/^#\/?/, "");
     var parts = hash.split("/");
     var page = parts[0] || "home";
+    currentIdea = null;
     if (page === "idea" && byId[parts[1]]) renderIdea(byId[parts[1]]);
     else if (page === "ideas") renderList(parts[1]);
     else if (page === "start") renderStart();
     else if (page === "about") renderAbout();
+    else if (page === "my") renderMy();
     else { page = "home"; renderHome(); }
 
     document.querySelectorAll("[data-nav]").forEach(function (a) {
@@ -445,5 +745,7 @@
   }
 
   window.addEventListener("hashchange", route);
+  bindTracker();
+  updateNavCount();
   route();
 })();
