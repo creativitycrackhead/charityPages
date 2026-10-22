@@ -2,6 +2,11 @@
 // Each idea is scored 1-5 on financial impact, ease (cost/time to start) and reach.
 // Rank is computed from the scores in app.js, so you can edit scores here freely.
 //
+// tagline: one "Because..." line that pairs the need with the benefit.
+// impact: what the program can do for a household (say "can", never promise).
+// glance: rough estimates shown in the "at a glance" strip. costMax is used to
+// count low-cost ideas on the home page (null = funded another way).
+//
 // Action levels: "simple", "moderate", "complex". Moderate and complex actions
 // carry entry/exit criteria so a volunteer knows when to start and when it's done.
 
@@ -20,6 +25,9 @@ window.IDEAS = [
     title: "Halal grocery bulk-buying co-op",
     category: "food",
     scores: { financial: 4, ease: 4, reach: 5 },
+    tagline: "Because every family deserves affordable halal food.",
+    impact: "Families can save on halal meat and staples every month by buying together at case prices.",
+    glance: { cost: "$0 upfront (orders are prepaid)", costMax: 0, volunteers: "4-7", launch: "4-6 weeks", launchWeeks: 6 },
     summary:
       "Families pool money on a set schedule (for example every two weeks) to buy halal meat, rice, lentils, flour, oil, dates and produce at wholesale or case prices. Volunteers place the order, receive it at the masjid, split it into shares, and families pick up after Maghrib or Jumu'ah.",
     why: [
@@ -71,6 +79,9 @@ window.IDEAS = [
     title: "Local zakat, sadaqah & qard hasan fund",
     category: "money",
     scores: { financial: 5, ease: 3, reach: 3 },
+    tagline: "Because zakat can change lives on your own street.",
+    impact: "A single grant or interest-free loan can keep a family housed and out of debt.",
+    glance: { cost: "Under $100 to set up", costMax: 100, volunteers: "3-5", launch: "1-2 months", launchWeeks: 8 },
     summary:
       "The masjid sets up a transparent local fund so that part of the community's zakat and sadaqah goes to eligible families nearby, for rent, utility bills, car repairs or emergencies. A second pot offers qard hasan: small interest-free loans that members repay, so the money is lent again and again.",
     why: [
@@ -86,7 +97,7 @@ window.IDEAS = [
       },
       {
         name: "Zakat Foundation of America",
-        text: "A U.S. charity that, alongside its international work, runs U.S. programs that help struggling families with emergency needs.",
+        text: "A U.S. charity that, alongside its international work, runs U.S. programs that help families through emergencies.",
         url: "https://www.zakat.org/u-s-programs",
       },
       {
@@ -121,6 +132,9 @@ window.IDEAS = [
     title: "Benefits & assistance help desk",
     category: "money",
     scores: { financial: 5, ease: 4, reach: 3 },
+    tagline: "Because help that goes unclaimed helps no one.",
+    impact: "One successful application can be worth hundreds to thousands of dollars a year to a household.",
+    glance: { cost: "Under $100", costMax: 100, volunteers: "2-4", launch: "3-4 weeks", launchWeeks: 4 },
     summary:
       "Trained volunteers help members and neighbors find and apply for programs they already qualify for but aren't using: food assistance (SNAP, WIC), utility bill help (LIHEAP), health coverage (Medicaid, CHIP, Marketplace subsidies), discounted phone/internet (Lifeline), and prescription assistance. Volunteers who speak Arabic, Urdu, Somali, Bengali or other community languages make a big difference.",
     why: [
@@ -168,6 +182,9 @@ window.IDEAS = [
     title: "Resume, job application & essay help",
     category: "jobs",
     scores: { financial: 4, ease: 5, reach: 3 },
+    tagline: "Because a better job changes everything at home.",
+    impact: "A new or better-paid job is often the biggest financial change a family can make.",
+    glance: { cost: "$0", costMax: 0, volunteers: "3-6", launch: "2 weeks", launchWeeks: 2 },
     summary:
       "Free drop-in sessions where volunteers help people write resumes and cover letters, fill out online job applications, prepare for interviews, and write school or scholarship essays. Professionals in the jama'ah share how hiring works in their field.",
     why: [
@@ -216,6 +233,9 @@ window.IDEAS = [
     title: "Halal budgeting & financial literacy class",
     category: "money",
     scores: { financial: 3, ease: 5, reach: 4 },
+    tagline: "Because a plan for money brings peace of mind.",
+    impact: "Families can build an emergency fund, avoid payday loans and calculate zakat with confidence.",
+    glance: { cost: "$0 with free curricula", costMax: 0, volunteers: "1-3", launch: "3-4 weeks", launchWeeks: 4 },
     summary:
       "A short course (6-8 weekly sessions) on budgeting, getting out of debt, building an emergency fund, avoiding payday loans, understanding credit, calculating zakat, and halal options for saving, home buying and retirement.",
     why: [
@@ -263,6 +283,9 @@ window.IDEAS = [
     title: "Eid clothing & kids' gear swap",
     category: "sharing",
     scores: { financial: 3, ease: 5, reach: 4 },
+    tagline: "Because every child should feel new on Eid.",
+    impact: "Families can dress growing kids for Eid and school for free.",
+    glance: { cost: "$0", costMax: 0, volunteers: "5-9", launch: "2-3 weeks", launchWeeks: 3 },
     summary:
       "A regular swap (before each Eid, back-to-school, and winter) where families bring clean, gently used clothing, modest wear, abayas, thobes, kufis, shoes, and kids' gear, and take what they need for free. Leftovers go to a shelter, refugee resettlement office or thrift partner.",
     why: [
@@ -313,6 +336,9 @@ window.IDEAS = [
     title: "Free tax preparation (VITA site)",
     category: "money",
     scores: { financial: 4, ease: 3, reach: 4 },
+    tagline: "Because families should keep the credits they've earned.",
+    impact: "Free filing saves a few hundred dollars in fees, and credits like the EITC can be worth thousands.",
+    glance: { cost: "$0 (the partner lends equipment)", costMax: 0, volunteers: "4-7", launch: "3-4 months (start in the fall)", launchWeeks: 16 },
     summary:
       "The masjid hosts a free tax-filing site during tax season through the IRS Volunteer Income Tax Assistance (VITA) program. IRS-certified volunteers prepare and e-file returns for low- and moderate-income households, people with disabilities, and limited-English speakers.",
     why: [
@@ -361,6 +387,9 @@ window.IDEAS = [
     title: "Babysitting co-op & halaqa childcare",
     category: "family",
     scores: { financial: 4, ease: 4, reach: 3 },
+    tagline: "Because parents deserve time to pray, learn and work.",
+    impact: "Parents can go to classes, interviews and appointments without paying for a sitter.",
+    glance: { cost: "$0", costMax: 0, volunteers: "6-12 families", launch: "2-4 weeks", launchWeeks: 4 },
     summary:
       "Member families trade babysitting with each other instead of paying for it. Each family earns points when they watch someone else's kids and spends points when someone watches theirs. The masjid can also run supervised childcare during halaqas, classes and Taraweeh so parents can attend.",
     why: [
@@ -402,10 +431,13 @@ window.IDEAS = [
     title: "Community iftar & meal share",
     category: "food",
     scores: { financial: 2, ease: 4, reach: 5 },
+    tagline: "Because no one should break their fast alone.",
+    impact: "A free nightly iftar can ease a family's food budget through Ramadan and welcome people who'd never ask for help.",
+    glance: { cost: "Covered by sponsors", costMax: null, volunteers: "8-15", launch: "4-6 weeks before Ramadan", launchWeeks: 6 },
     summary:
       "Turn Ramadan iftars into a year-round meal program: open iftars that welcome students, singles, reverts, neighbors and families on tight budgets, plus a monthly community dinner and a volunteer team that cooks and delivers meals to the elderly, new mothers and families in crisis.",
     why: [
-      "A free nightly iftar saves a struggling family real money over 30 days, and reaches people who would never ask for help.",
+      "A free nightly iftar can save a family real money over 30 days, and it reaches people who would never ask for help.",
       "It's something nearly every masjid already does, so the skills, kitchens and volunteers already exist.",
       "Opening iftar to neighbors of all faiths builds understanding and good relations with the wider community.",
     ],
@@ -449,6 +481,9 @@ window.IDEAS = [
     title: "Skills exchange / time bank",
     category: "sharing",
     scores: { financial: 3, ease: 3, reach: 3 },
+    tagline: "Because everyone has something to give.",
+    impact: "Members can trade an hour of what they know for an hour of what they need.",
+    glance: { cost: "Under $100", costMax: 100, volunteers: "1-2 coordinators", launch: "4-6 weeks", launchWeeks: 6 },
     summary:
       "Members offer skills and services to each other (rides, yard work, cooking, simple repairs, Qur'an or Arabic lessons, English practice, computer help) and earn time credits for every hour given. One hour of help always equals one credit, whatever the skill.",
     why: [
@@ -496,6 +531,9 @@ window.IDEAS = [
     title: "Repair café & car-care clinic",
     category: "sharing",
     scores: { financial: 3, ease: 3, reach: 3 },
+    tagline: "Because fixing beats replacing.",
+    impact: "Fixing a lamp, bike or coat can save the cost of a new one and keep it out of the landfill.",
+    glance: { cost: "Under $200 in tools", costMax: 200, volunteers: "3-8", launch: "3-4 weeks", launchWeeks: 4 },
     summary:
       "A free monthly event where volunteers with handy skills help people fix broken things together: small appliances, lamps, clothing, bikes, furniture and electronics. A car-care version teaches basics like checking fluids, changing wiper blades and tire pressure.",
     why: [
@@ -544,6 +582,9 @@ window.IDEAS = [
     title: "Tutoring & homework club",
     category: "family",
     scores: { financial: 2, ease: 4, reach: 3 },
+    tagline: "Because every child deserves a fair shot at school.",
+    impact: "Free homework help can keep kids on track without the cost of private tutoring.",
+    glance: { cost: "Under $100 in supplies", costMax: 100, volunteers: "4-10", launch: "4-6 weeks", launchWeeks: 6 },
     summary:
       "A weekly after-school homework club at the masjid where volunteers help kids with reading, math and homework, often right before or after Islamic school. It can also include adult tutoring like English as a Second Language (ESL), citizenship test prep, or GED prep.",
     why: [
@@ -592,6 +633,9 @@ window.IDEAS = [
     title: "Masjid pantry & halal food shelf",
     category: "food",
     scores: { financial: 2, ease: 5, reach: 2 },
+    tagline: "Because hunger doesn't keep office hours.",
+    impact: "Neighbors can get halal food any time of day, no questions asked.",
+    glance: { cost: "Under $100", costMax: 100, volunteers: "2-4", launch: "1-2 weeks", launchWeeks: 2 },
     summary:
       "A small weatherproof cabinet outside the masjid that anyone can stock with non-perishable halal food and basics, and anyone can take from, any time, no questions asked. It can grow into an indoor halal food pantry, since many regular food banks can't offer halal meat.",
     why: [
@@ -640,6 +684,9 @@ window.IDEAS = [
     title: "Tool & equipment lending library",
     category: "sharing",
     scores: { financial: 2, ease: 3, reach: 3 },
+    tagline: "Because most tools are only used a few times.",
+    impact: "Members can borrow instead of buy, from drills to the big cooking pots needed for a walima.",
+    glance: { cost: "$0 to start (donated items)", costMax: 0, volunteers: "2-3", launch: "4-6 weeks", launchWeeks: 6 },
     summary:
       "A shared collection of tools and occasional-use equipment that members can borrow for free instead of buying: drills, ladders, lawn tools, folding tables, large cooking pots and chafing dishes for walimas and Eid parties, and extra prayer mats.",
     why: [
@@ -689,6 +736,9 @@ window.IDEAS = [
     title: "Masjid community garden",
     category: "food",
     scores: { financial: 2, ease: 2, reach: 3 },
+    tagline: "Because good food can grow right outside the masjid.",
+    impact: "Families can grow fresh vegetables and herbs, and share the extra with the pantry.",
+    glance: { cost: "$300-800 for beds and soil", costMax: 800, volunteers: "4-8", launch: "One growing season", launchWeeks: 12 },
     summary:
       "Unused masjid land becomes garden beds where families grow vegetables and herbs for themselves, with part of the harvest given to the masjid pantry or local food banks. Many mosques plant fruit trees too, a classic form of sadaqah jariyah.",
     why: [
@@ -737,6 +787,9 @@ window.IDEAS = [
     title: "Volunteer ride program",
     category: "care",
     scores: { financial: 2, ease: 3, reach: 2 },
+    tagline: "Because no one should miss Jumu'ah for lack of a ride.",
+    impact: "Elders and newcomers can get to prayer, appointments and interviews without paying for rides.",
+    glance: { cost: "$0", costMax: 0, volunteers: "5+ drivers", launch: "3-4 weeks", launchWeeks: 4 },
     summary:
       "Volunteer drivers give free rides to members and neighbors who can't drive or don't have a car: elders, people with disabilities, new arrivals, and one-car families. Rides cover Jumu'ah and Eid prayers, medical appointments, grocery trips and job interviews.",
     why: [

@@ -10,6 +10,8 @@ Each idea has:
 
 Ideas are scored 1-5 on **savings**, **ease** and **reach**, and the site ranks them by total.
 
+The site has a home page, a filterable list of ideas, a page per idea (with an "at a glance" box and a printable plan), a "How to start" guide with an Islamic-calendar planner, and an About page. Its voice and look are modeled on charities known for clear, trusted communication. See [`docs/style-guide.md`](docs/style-guide.md) for what we learned and the rules to follow when adding content.
+
 ## Run it locally
 
 No build step. Open `index.html` in a browser, or serve the folder:
@@ -36,5 +38,6 @@ All content lives in [`assets/ideas.js`](assets/ideas.js). Add an object to `win
 | `assets/app.js` | List, search, filter, sort and detail views (hash routes like `#/idea/<id>`) |
 | `assets/styles.css` | Styles, with light and dark themes |
 | `assets/favicon.svg` | Eight-pointed star icon |
+| `docs/style-guide.md` | Voice, writing and visual rules, with the charities they're drawn from |
 
 The real-world examples were checked to exist in October 2026. Programs change, so confirm current details with each organization before relying on them.
