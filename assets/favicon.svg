@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <symbol id="mark" viewBox="0 0 32 32">
+    <!-- Eight-pointed star (two overlapping squares), a common motif in Islamic geometric art -->
+    <rect x="7" y="7" width="18" height="18" rx="2" fill="#1f6f5c"/>
+    <rect x="7" y="7" width="18" height="18" rx="2" fill="#1f6f5c" transform="rotate(45 16 16)"/>
+    <circle cx="16" cy="16" r="5" fill="#f4e7cf"/>
+  </symbol>
+  <use href="#mark"/>
+</svg>
