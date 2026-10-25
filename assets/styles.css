@@ -442,6 +442,39 @@ main { padding-bottom: 72px; }
 .log-table td:nth-child(n+2), .log-table th:nth-child(n+2) { text-align: left; }
 .empty-state.small { margin-top: 32px; padding: 28px 16px; }
 
+/* Impact report */
+.report-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 14px 20px; margin-top: 24px; }
+.report-controls label { display: grid; gap: 4px; font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+.report-controls label.check { display: flex; align-items: center; gap: 8px; padding-bottom: 10px; }
+.report-controls select, .report-controls input[type="text"] {
+  font: inherit; font-weight: 400; color: var(--text); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 200px;
+}
+.report-controls .cta-row { margin-top: 0; }
+.report { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; box-shadow: var(--shadow); max-width: 900px; }
+.report-head { display: flex; align-items: center; gap: 16px; padding-bottom: 18px; border-bottom: 3px solid var(--brand-2); }
+.report-star { width: 52px; height: 52px; fill: var(--brand-2); flex: none; }
+.report-star .star-core { fill: var(--accent); }
+.report-head .eyebrow { margin: 0; }
+.report-head h2 { margin: 2px 0 0; font-size: 1.9rem; }
+.report-period { margin: 2px 0 0; color: var(--muted); font-weight: 600; }
+.report .stats { margin-top: 20px; }
+.rp { margin-top: 18px; padding: 16px 18px; border: 1px solid var(--line); border-left: 5px solid var(--c); border-radius: 12px; break-inside: avoid; }
+.rp-head { display: flex; align-items: center; gap: 12px; }
+.rp-head .card-icon { width: 32px; height: 32px; border-radius: 8px; }
+.rp-head h3 { margin: 0; flex: 1; font-family: var(--display); font-size: 1.15rem; }
+.mini { width: 120px; height: 30px; fill: var(--c); flex: none; }
+.rp-nums { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 12px 0 0; }
+.rp-nums dt { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; }
+.rp-nums dd { margin: 0; font-weight: 700; font-size: 1.1rem; }
+.rp-line { margin: 10px 0 0; font-size: 0.92rem; color: var(--muted); }
+.rp-line strong { color: var(--text); }
+.rp-notes { margin: 8px 0 0; padding-left: 1.1em; font-size: 0.9rem; color: var(--muted); }
+.report-summary { margin-top: 22px; padding: 16px 18px; background: var(--brand-soft); border-radius: 12px; break-inside: avoid; }
+.report-summary h3 { margin: 0 0 6px; font-size: 1rem; }
+.report-summary p { margin: 0; }
+.report-foot { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.8rem; }
+
 /* Guide */
 .guide { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
 .guide li { display: flex; gap: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
@@ -494,6 +527,9 @@ td:nth-child(n+3), th:nth-child(n+3) { text-align: center; }
   .guide li { flex-direction: column; gap: 6px; }
   .action.tracked { padding-left: 60px; }
   #log-form { grid-template-columns: 1fr; }
+  .report { padding: 20px 16px; }
+  .rp-nums { grid-template-columns: repeat(3, 1fr); }
+  .mini { display: none; }
   .action.tracked::before { display: none; }
   .nav { gap: 0; }
   .nav a { padding: 6px 7px; }
@@ -512,6 +548,13 @@ td:nth-child(n+3), th:nth-child(n+3) { text-align: center; }
 
 @media print {
   .site-header, .site-footer, .no-print, .step-note { display: none !important; }
+  main { padding: 0; }
+  .report { border: 0; box-shadow: none; padding: 0; max-width: none; background: #fff !important; color: #000; }
+  .rp, .report-summary { background: #fff !important; }
+  .report .stats { grid-template-columns: repeat(4, 1fr); }
+  .rp-nums { grid-template-columns: repeat(5, 1fr); }
+  .mini { display: block; }
+  .cat-tint-food, .cat-tint-money, .cat-tint-jobs, .cat-tint-family, .cat-tint-sharing, .cat-tint-care { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   body { background: #fff; color: #000; font-size: 12pt; }
   .idea-hero { background: none; padding: 0; }
   .idea-hero-grid { grid-template-columns: 1fr; }

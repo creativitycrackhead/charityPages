@@ -5,6 +5,8 @@
 //   #/start            how to start any program
 //   #/about            how ideas are scored and where the voice comes from
 //   #/my               dashboard of programs this browser is tracking
+//   #/my/<id>          one tracked program's dashboard and impact log
+//   #/report/<period>  printable impact report (YYYY-MM, YYYY or all)
 (function () {
   "use strict";
 
@@ -732,6 +734,155 @@
     renderProgramDash(idea);
   });
 
+  // ---- Impact report ----
+  // #/report/<period>, where period is "YYYY-MM", "YYYY" or "all". A printable
+  // one-page summary across all tracked programs for the board or donors.
+  // Program leads are left out; session notes only appear if the user opts in.
+
+  var NAME_KEY = "masjidName";
+
+  function readSetting(key) { try { return localStorage.getItem(key) || ""; } catch (e) { return ""; } }
+  function writeSetting(key, val) { try { localStorage.setItem(key, val); } catch (e) { /* ignore */ } }
+
+  function periodLabel(period) {
+    if (period === "all") return "All time";
+    if (/^\d{4}$/.test(period)) return period === String(new Date().getFullYear()) ? period + " so far" : period;
+    var parts = period.split("-");
+    return new Date(+parts[0], +parts[1] - 1, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
+  }
+
+  function inPeriod(dateStr, period) { return period === "all" || (dateStr || "").indexOf(period) === 0; }
+
+  function reportPeriods(data) {
+    var months = {};
+    Object.keys(data).forEach(function (id) {
+      (data[id].log || []).forEach(function (e) { months[e.date.slice(0, 7)] = true; });
+    });
+    // Default to the latest month with data; the current month if there's none.
+    if (!Object.keys(months).length) months[todayYmd().slice(0, 7)] = true;
+    var list = Object.keys(months).sort().reverse();
+    var years = {};
+    list.forEach(function (m) { years[m.slice(0, 4)] = true; });
+    return list.concat(Object.keys(years).sort().reverse(), ["all"]);
+  }
+
+  function miniBars(entries) {
+    if (!entries.length) return "";
+    var max = Math.max.apply(null, entries.map(function (e) { return Number(e.families) || 0; })) || 1;
+    var W = 160, H = 40, slot = W / Math.max(entries.length, 4), bw = Math.max(3, Math.min(18, slot - 2));
+    return '<svg class="mini" viewBox="0 0 ' + W + " " + H + '" aria-hidden="true">' + entries.map(function (e, i) {
+      var h = Math.max(2, ((Number(e.families) || 0) / max) * (H - 2));
+      return '<rect x="' + (i * slot + (slot - bw) / 2) + '" y="' + (H - h) + '" width="' + bw + '" height="' + h + '" rx="2"/>';
+    }).join("") + "</svg>";
+  }
+
+  function renderReport(period) {
+    var data = loadPrograms();
+    var periods = reportPeriods(data);
+    if (periods.indexOf(period) === -1) period = periods[0];
+    setTitle("Impact report");
+    var includeNotes = readSetting("reportNotes") === "1";
+    var masjid = readSetting(NAME_KEY);
+
+    var rows = trackedIds().map(function (id) {
+      var idea = byId[id], prog = data[id];
+      var entries = impactOf(prog).log.filter(function (e) { return inPeriod(e.date, period); });
+      var steps = idea.actions.filter(function (a, i) {
+        var st = prog.steps[i];
+        return st && st.doneAt && inPeriod(st.doneAt.slice(0, 10), period);
+      }).map(function (a) { return a.title; });
+      var sum = function (k) { return entries.reduce(function (n, e) { return n + (Number(e[k]) || 0); }, 0); };
+      return { idea: idea, prog: prog, entries: entries, steps: steps, p: progressOf(idea, prog),
+        families: sum("families"), hours: sum("hours"), saved: sum("saved") };
+    }).filter(function (r) { return r.entries.length || r.steps.length; });
+    rows.sort(function (a, b) { return b.families - a.families || b.entries.length - a.entries.length; });
+
+    var tot = rows.reduce(function (t, r) {
+      t.families += r.families; t.hours += r.hours; t.saved += r.saved; t.sessions += r.entries.length; t.steps += r.steps.length;
+      return t;
+    }, { families: 0, hours: 0, saved: 0, sessions: 0, steps: 0 });
+
+    var options = periods.map(function (pd) {
+      return '<option value="' + pd + '"' + (pd === period ? " selected" : "") + ">" + esc(periodLabel(pd)) + "</option>";
+    }).join("");
+
+    var tiles = [
+      [num(tot.families), "families served"],
+      [tot.sessions, tot.sessions === 1 ? "session" : "sessions"],
+      [num(tot.hours), "volunteer hours"],
+      [tot.saved ? money(tot.saved) : "–", "saved for families"],
+    ].map(function (t) { return '<div class="stat"><strong>' + t[0] + "</strong><span>" + t[1] + "</span></div>"; }).join("");
+
+    var programs = rows.map(function (r) {
+      var notes = includeNotes ? r.entries.filter(function (e) { return e.note; }) : [];
+      return (
+        '<section class="rp cat-tint-' + r.idea.category + '">' +
+        '<div class="rp-head"><span class="card-icon cat-' + r.idea.category + '">' + icon(r.idea.category, "icon icon-sm") + "</span>" +
+        "<h3>" + esc(r.idea.title) + "</h3>" + miniBars(r.entries) + "</div>" +
+        '<dl class="rp-nums">' +
+        "<div><dt>Families</dt><dd>" + num(r.families) + "</dd></div>" +
+        "<div><dt>Sessions</dt><dd>" + r.entries.length + "</dd></div>" +
+        "<div><dt>Volunteer hours</dt><dd>" + num(r.hours) + "</dd></div>" +
+        "<div><dt>Saved</dt><dd>" + (r.saved ? money(r.saved) : "–") + "</dd></div>" +
+        "<div><dt>Plan progress</dt><dd>" + r.p.pct + "%</dd></div></dl>" +
+        (r.steps.length ? '<p class="rp-line"><strong>Steps completed:</strong> ' + r.steps.map(esc).join("; ") + "</p>" : "") +
+        (notes.length ? '<ul class="rp-notes">' + notes.map(function (e) { return "<li><strong>" + esc(fmtDay(e.date)) + ":</strong> " + esc(e.note) + "</li>"; }).join("") + "</ul>" : "") +
+        "</section>"
+      );
+    }).join("");
+
+    var who = masjid ? masjid : "Our masjid";
+    var newsletter = rows.length
+      ? (periodLabel(period) === "All time" ? "So far, " : "In " + periodLabel(period).replace(" so far", "") + ", ") +
+        (masjid ? masjid + "'s" : "our masjid's") + " community programs served " + num(tot.families) + (tot.families === 1 ? " family" : " families") +
+        " across " + tot.sessions + (tot.sessions === 1 ? " session" : " sessions") +
+        (tot.hours ? ", thanks to " + num(tot.hours) + " volunteer hours" : "") + "." +
+        (tot.saved ? " Together we saved families about " + money(tot.saved) + "." : "") +
+        " " + rows.filter(function (r) { return r.families > 0; }).slice(0, 4).map(function (r) {
+          return r.idea.title + ": " + num(r.families) + (r.families === 1 ? " family" : " families") + (r.entries.length ? " over " + r.entries.length + (r.entries.length === 1 ? " session" : " sessions") : "") + ".";
+        }).join(" ") +
+        " JazakAllahu khayran to every volunteer and donor. Everyone is welcome to join us."
+      : "";
+
+    main.innerHTML =
+      '<section class="page-head no-print"><div class="wrap">' +
+      '<p class="crumbs"><a href="#/my">My programs</a> <span aria-hidden="true">/</span> Impact report</p>' +
+      "<h1>Impact report</h1>" +
+      '<p class="lede">A one-page summary for your board, donors or newsletter. It never includes names.</p>' +
+      '<div class="report-controls">' +
+      '<label>Period<select id="rp-period">' + options + "</select></label>" +
+      '<label>Masjid name<input type="text" id="rp-name" maxlength="80" placeholder="e.g. Masjid An-Noor" value="' + esc(masjid) + '"></label>' +
+      '<label class="check"><input type="checkbox" id="rp-notes"' + (includeNotes ? " checked" : "") + "> Include session notes</label>" +
+      '<div class="cta-row"><button type="button" class="btn btn-primary" id="rp-print"' + (rows.length ? "" : " disabled") + ">" + icon("print") + "Print or save as PDF</button>" +
+      '<button type="button" class="btn btn-ghost" id="rp-copy"' + (rows.length ? "" : " disabled") + ">" + icon("link") + "<span>Copy newsletter text</span></button></div>" +
+      "</div></div></section>" +
+      '<div class="wrap">' +
+      '<article class="report">' +
+      '<header class="report-head">' + starSvg("report-star") +
+      "<div><p class=\"eyebrow\">Community programs report</p><h2>" + esc(who) + "</h2>" +
+      '<p class="report-period">' + esc(periodLabel(period)) + "</p></div></header>" +
+      (rows.length
+        ? '<div class="stats">' + tiles + "</div>" + programs +
+          (newsletter ? '<section class="report-summary"><h3>In a sentence</h3><p id="rp-text">' + esc(newsletter) + "</p></section>" : "")
+        : '<div class="empty-state small"><h2>Nothing logged for ' + esc(periodLabel(period)) + "</h2><p>Log sessions on each program's dashboard and they'll show up here. Try another period above.</p></div>") +
+      '<footer class="report-foot">Prepared ' + esc(fmtDate(new Date().toISOString())) + " with Masjid Community Ideas. Figures are entered by program volunteers.</footer>" +
+      "</article></div>";
+
+    document.getElementById("rp-period").addEventListener("change", function (e) { location.hash = "#/report/" + e.target.value; });
+    var nameInput = document.getElementById("rp-name");
+    nameInput.addEventListener("change", function () { writeSetting(NAME_KEY, nameInput.value.trim()); renderReport(period); });
+    document.getElementById("rp-notes").addEventListener("change", function (e) { writeSetting("reportNotes", e.target.checked ? "1" : ""); renderReport(period); });
+    document.getElementById("rp-print").addEventListener("click", function () { window.print(); });
+    var copyBtn = document.getElementById("rp-copy");
+    copyBtn.addEventListener("click", function () {
+      var label = copyBtn.querySelector("span");
+      var el = document.getElementById("rp-text");
+      function done(t) { label.textContent = t; setTimeout(function () { label.textContent = "Copy newsletter text"; }, 2000); }
+      if (el && navigator.clipboard) navigator.clipboard.writeText(el.textContent).then(function () { done("Copied"); }, function () { done("Couldn't copy"); });
+      else done("Couldn't copy");
+    });
+  }
+
   // ---- My programs (dashboard) ----
 
   function renderMy() {
@@ -753,6 +904,7 @@
       '<section class="page-head"><div class="wrap">' +
       '<p class="eyebrow">Dashboard</p><h1>My programs</h1>' +
       '<p class="lede">Every program your masjid is running, how far along it is, and the difference it\'s making. Open one to log sessions and see its impact.</p>' +
+      (items.length ? '<div class="cta-row no-print"><a class="btn btn-primary" href="#/report/' + todayYmd().slice(0, 7) + '">' + icon("print") + "Impact report</a></div>" : "") +
       (items.length
         ? '<div class="stats">' +
           [[items.length, items.length === 1 ? "program in progress" : "programs in progress"],
@@ -944,10 +1096,11 @@
     else if (page === "about") renderAbout();
     else if (page === "my" && byId[parts[1]] && getProgram(parts[1])) renderProgramDash(byId[parts[1]]);
     else if (page === "my") renderMy();
+    else if (page === "report") renderReport(parts[1]);
     else { page = "home"; renderHome(); }
 
     document.querySelectorAll("[data-nav]").forEach(function (a) {
-      var active = a.dataset.nav === page || (page === "idea" && a.dataset.nav === "ideas");
+      var active = a.dataset.nav === page || (page === "idea" && a.dataset.nav === "ideas") || (page === "report" && a.dataset.nav === "my");
       if (active) a.setAttribute("aria-current", "page");
       else a.removeAttribute("aria-current");
     });
